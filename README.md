@@ -116,10 +116,4 @@ The application uses a service layer pattern (`*-service.ts` files) to encapsula
 
 Each service includes comprehensive logging for debugging and monitoring.
 
-## Other Trade-offs & Future Improvements
 
-- **No Redis / Idempotency:** I skipped the bonus idempotency requirement. While I know it's important for payment webhooks, I wanted to focus on getting the core concurrency right. If I had more time, I'd add Redis (Upstash) to store `Idempotency-Key` headers for 24 hours to prevent duplicate confirm/release actions.
-- **Raw SQL in Prisma:** Prisma doesn't natively support `SELECT FOR UPDATE`, which is why I had to use `$queryRaw` inside the transaction. It's a bit ugly but it's the standard workaround for this in the Prisma ecosystem.
-- **UI/UX:** The frontend is just functional using Tailwind. I didn't spend time making it look like a polished consumer app since the focus was backend correctness.
-- **Tests:** There are no automated tests. In a real scenario, I'd at least write some integration tests for the reservation endpoint using something like Jest or Vitest to pound it with concurrent requests and verify exactly one succeeds.
-- **Background Jobs:** The lazy expiration approach could be enhanced with a Vercel Cron job for periodic cleanup of expired reservations.
