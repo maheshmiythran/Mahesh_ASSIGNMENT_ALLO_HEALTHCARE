@@ -55,9 +55,71 @@ If a `PENDING` reservation is past its `expiresAt` time, the API automatically f
 
 **Trade-off:** This means expired reservations might sit in the database as `PENDING` indefinitely if no one ever tries to interact with them again. For a real production system, I'd probably add a lightweight Vercel Cron job that hits a cleanup endpoint every 5 minutes to sweep these up, but lazy expiration handles the core correctness requirement nicely without extra infrastructure.
 
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── api/              # API route handlers
+│   │   ├── products/     # Product endpoints
+│   │   ├── reservations/ # Reservation endpoints (create, confirm, release)
+│   │   └── warehouses/   # Warehouse endpoints
+│   ├── reservation/      # Reservation UI pages
+│   └── layout.tsx        # Main layout
+├── lib/
+│   ├── constants.ts          # Application constants
+│   ├── types.ts              # TypeScript type definitions
+│   ├── logger.ts             # Logging utility
+│   ├── validation.ts         # Request validation schemas
+│   ├── errors.ts             # Error handling utilities
+│   ├── inventory-helpers.ts  # Inventory calculation helpers
+│   ├── reservation-service.ts # Reservation business logic
+│   ├── product-service.ts     # Product business logic
+│   ├── warehouse-service.ts   # Warehouse business logic
+│   └── db.ts                 # Prisma client
+└── prisma/
+    ├── schema.prisma        # Database schema
+    └── seed.ts              # Database seed script
+```
+
+## API Endpoints
+
+### Products
+- `GET /api/products` - List all products with inventory across warehouses
+
+### Reservations
+- `POST /api/reservations` - Create a new reservation
+  - Body: `{ productId, warehouseId, quantity }`
+- `GET /api/reservations/[id]` - Get reservation details
+- `POST /api/reservations/[id]/confirm` - Confirm a reservation
+- `POST /api/reservations/[id]/release` - Release a reservation
+
+### Warehouses
+- `GET /api/warehouses` - List all warehouses with inventory summary
+
+## Core Libraries & Technologies
+
+- **Next.js 16** - React framework with App Router
+- **Prisma 5** - Database ORM with type safety
+- **PostgreSQL** - Primary database
+- **Zod** - Runtime type validation
+- **Tailwind CSS** - Utility-first CSS framework
+- **TypeScript** - Static type checking
+
+## Service Layer Architecture
+
+The application uses a service layer pattern (`*-service.ts` files) to encapsulate business logic:
+
+- **ReservationService** - Handles reservation creation, confirmation, and release with row-level locking
+- **ProductService** - Manages product queries and inventory aggregation
+- **WarehouseService** - Handles warehouse queries and utilization calculations
+
+Each service includes comprehensive logging for debugging and monitoring.
+
 ## Other Trade-offs & Future Improvements
 
 - **No Redis / Idempotency:** I skipped the bonus idempotency requirement. While I know it's important for payment webhooks, I wanted to focus on getting the core concurrency right. If I had more time, I'd add Redis (Upstash) to store `Idempotency-Key` headers for 24 hours to prevent duplicate confirm/release actions.
 - **Raw SQL in Prisma:** Prisma doesn't natively support `SELECT FOR UPDATE`, which is why I had to use `$queryRaw` inside the transaction. It's a bit ugly but it's the standard workaround for this in the Prisma ecosystem.
 - **UI/UX:** The frontend is just functional using Tailwind. I didn't spend time making it look like a polished consumer app since the focus was backend correctness.
 - **Tests:** There are no automated tests. In a real scenario, I'd at least write some integration tests for the reservation endpoint using something like Jest or Vitest to pound it with concurrent requests and verify exactly one succeeds.
+- **Background Jobs:** The lazy expiration approach could be enhanced with a Vercel Cron job for periodic cleanup of expired reservations.
