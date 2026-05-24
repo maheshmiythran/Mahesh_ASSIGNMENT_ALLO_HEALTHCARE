@@ -30,6 +30,23 @@ This is my submission for the Allo Engineering Take-Home Exercise. It's a Next.j
    ```
    Open [http://localhost:3000](http://localhost:3000)
 
+## Deployment to Vercel
+
+For production deployment with a hosted PostgreSQL database:
+
+**Quick Start:**
+1. Set up a database with **Neon** or **Supabase** (free tier)
+2. Deploy to **Vercel** (free tier)
+3. Follow the [DEPLOYMENT.md](DEPLOYMENT.md) guide for detailed steps
+
+**Key Points:**
+- Uses Vercel for Next.js hosting
+- PostgreSQL hosted on Neon or Supabase
+- Optional Redis on Upstash for future enhancements
+- Zero-cost for free tier deployment
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for complete setup instructions and troubleshooting.
+
 ## Architecture & Concurrency Strategy
 
 The core challenge was making sure two users can't reserve the last unit at the exact same time.
