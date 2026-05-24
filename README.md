@@ -1,6 +1,6 @@
 # Allo Inventory Reservation System
 
-This is a student-style project built for the Allo Engineering take-home assignment. It is designed to show my skills as an entry-level internship candidate while keeping the app simple and easy to understand.
+This is my submission for the Allo Engineering Take-Home Exercise. It's a Next.js App Router application that handles temporary stock reservations during checkout, ensuring we don't oversell when multiple users try to buy the same item at the exact same time.
 
 ## What this project does
 
