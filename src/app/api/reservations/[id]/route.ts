@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = 'force-dynamic';
 
@@ -23,12 +23,12 @@ export async function GET(
     });
 
     if (!reservation) {
-      return Response.json({ error: "Reservation not found" }, { status: 404 });
+      return NextResponse.json({ error: "Reservation not found" }, { status: 404 });
     }
 
-    return Response.json(reservation);
+    return NextResponse.json(reservation);
   } catch (error) {
     console.error("Failed to fetch reservation:", error);
-    return Response.json({ error: "Failed to fetch reservation" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch reservation" }, { status: 500 });
   }
 }

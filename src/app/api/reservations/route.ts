@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db';
 
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const parsed = reservationSchema.safeParse(body);
 
     if (!parsed.success) {
-      return Response.json({ error: 'Invalid request body', details: parsed.error.issues }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid request body', details: parsed.error.issues }, { status: 400 });
     }
 
     const { productId, warehouseId, quantity } = parsed.data;
@@ -58,15 +58,15 @@ export async function POST(request: NextRequest) {
       return newReservation;
     });
 
-    return Response.json(reservation, { status: 201 });
+    return NextResponse.json(reservation, { status: 201 });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Something went wrong';
 
     if (message === 'Not enough stock available' || message === 'Inventory not found') {
-      return Response.json({ error: message }, { status: 409 });
+      return NextResponse.json({ error: message }, { status: 409 });
     }
 
     console.error('Failed to create reservation:', error);
-    return Response.json({ error: 'Failed to create reservation' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to create reservation' }, { status: 500 });
   }
 }

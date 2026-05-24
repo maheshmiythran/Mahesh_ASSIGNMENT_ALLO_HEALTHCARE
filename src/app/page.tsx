@@ -20,6 +20,12 @@ interface Product {
   inventory: InventoryItem[];
 }
 
+const currencyFormatter = new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  maximumFractionDigits: 2,
+});
+
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,8 +41,8 @@ export default function HomePage() {
   async function fetchProducts() {
     try {
       const res = await fetch('/api/products');
-      if (!res.ok) throw new Error('Failed to fetch products');
       const data = await res.json();
+      if (!res.ok) throw new Error(data?.error ?? 'Failed to fetch products');
       setProducts(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
@@ -125,7 +131,7 @@ export default function HomePage() {
               <p className="text-sm text-gray-500 mt-1">{product.description}</p>
             )}
             <p className="text-base font-semibold text-gray-800 mt-2">
-              ${product.price.toFixed(2)}
+              {currencyFormatter.format(product.price)}
             </p>
 
             {product.inventory.length === 0 ? (
@@ -151,7 +157,7 @@ export default function HomePage() {
                             max={inv.availableQuantity}
                             value={quantities[inv.id] || 1}
                             onChange={(e) => handleQuantityChange(inv.id, parseInt(e.target.value) || 1)}
-                            className="w-20 border border-gray-300 rounded px-2 py-1 text-sm"
+                            className="w-24 border border-gray-300 rounded-md bg-white text-black px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                           />
                           <button
                             onClick={() => handleReserve(product.id, inv.warehouseId, inv.id, inv.availableQuantity)}

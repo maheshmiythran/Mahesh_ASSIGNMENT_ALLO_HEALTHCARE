@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -16,11 +16,11 @@ export async function POST(
     });
 
     if (!reservation) {
-      return Response.json({ error: 'Reservation not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Reservation not found' }, { status: 404 });
     }
 
     if (reservation.status !== 'PENDING') {
-      return Response.json({ error: 'Reservation is not pending' }, { status: 400 });
+      return NextResponse.json({ error: 'Reservation is not pending' }, { status: 400 });
     }
 
     // lazy expiry check
@@ -36,7 +36,7 @@ export async function POST(
         }),
       ]);
 
-      return Response.json({ error: 'Reservation has expired' }, { status: 410 });
+      return NextResponse.json({ error: 'Reservation has expired' }, { status: 410 });
     }
 
     // confirm: move from reserved to consumed (decrement both)
@@ -54,9 +54,9 @@ export async function POST(
       }),
     ]);
 
-    return Response.json(updatedReservation);
+    return NextResponse.json(updatedReservation);
   } catch (error) {
     console.error('Failed to confirm reservation:', error);
-    return Response.json({ error: 'Failed to confirm reservation' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to confirm reservation' }, { status: 500 });
   }
 }

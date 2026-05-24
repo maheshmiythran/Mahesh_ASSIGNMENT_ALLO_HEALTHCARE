@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -31,9 +31,9 @@ export async function GET(request: NextRequest) {
       })),
     }));
 
-    return Response.json(result);
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Failed to fetch products:', error);
-    return Response.json({ error: 'Failed to fetch products' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
   }
 }

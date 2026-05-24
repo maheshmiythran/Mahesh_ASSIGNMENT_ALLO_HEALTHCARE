@@ -24,6 +24,12 @@ interface Reservation {
   };
 }
 
+const currencyFormatter = new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  maximumFractionDigits: 2,
+});
+
 export default function ReservationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
 
@@ -200,7 +206,7 @@ export default function ReservationPage({ params }: { params: Promise<{ id: stri
             <div>
               <p className="text-sm text-gray-500">Price</p>
               <p className="font-medium text-gray-900">
-                ${(reservation.inventory.product.price * reservation.quantity).toFixed(2)}
+                {currencyFormatter.format(reservation.inventory.product.price * reservation.quantity)}
               </p>
             </div>
           </div>
